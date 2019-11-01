@@ -1,16 +1,40 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useReducer } from 'react';
 import axios from 'axios';
 
 
 export function useApplicationData(props) {
 
-    const [state, setState] = useState({
+const initial = {
     day: "Monday",
     days: [],
     appointments: {}
-  })
+  }
 
-  const setDay = day => setState({ ...state, day });
+  const SET_DAY = "SET_DAY";
+  const SET_APPLICATION_DATA = "SET_APPLICATION_DATA";
+  const SET_INTERVIEW = "SET_INTERVIEW";
+
+  function reducer(state, action) {
+    switch (action.type) {
+      case SET_DAY:
+        return { ...state, ...action.value }
+
+      case SET_APPLICATION_DATA:
+        return { ...state, ...action.value }
+
+      case SET_INTERVIEW:
+        return { ...state, ...action.value }
+
+      default:
+        throw new Error(
+          `Tried to reduce with unsupported action type: ${action.type}`
+        );
+    }
+  }
+
+  const [state, dispatch] = useReducer(reducer, initial);
+
+  const setDay = day => dispatch({ type: SET_DAY, value: {day} });
 
   useEffect(() => {
     Promise.all([
@@ -22,7 +46,7 @@ export function useApplicationData(props) {
       const appointments = all[1].data;
       const interviewers = all[2].data;
 
-      setState(prev => ({ ...prev, days, appointments, interviewers }))
+      dispatch({ type: SET_APPLICATION_DATA, value: {days, appointments, interviewers} })
     })
   }, [])
 
@@ -38,15 +62,14 @@ export function useApplicationData(props) {
           ...state.appointments,
           [id]: appointment
         };
-        setState(state => ({ ...state, appointments }));
+        dispatch({ type: SET_INTERVIEW, value: {appointments} });
       })
   }
 
   //cancel interview
   function cancelInterview(id, interview) {
     return axios.delete(`http://localhost:8001/api/appointments/${id}`)
-      .then(() =>
-        setState(state => {
+      .then(() => {
           const appointment = {
             ...state.appointments[id],
             interview: null
@@ -55,9 +78,9 @@ export function useApplicationData(props) {
             ...state.appointments,
             [id]: appointment
           };
-          return { ...state, appointments }
+          
+          dispatch({ type: SET_INTERVIEW, value: {appointments} });
         })
-      )
   }
 
   return {
