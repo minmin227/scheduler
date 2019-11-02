@@ -7,7 +7,7 @@ export function useApplicationData(props) {
 const initial = {
     day: "Monday",
     days: [],
-    appointments: {}
+    appointments: {},
   }
 
   const SET_DAY = "SET_DAY";
@@ -52,16 +52,26 @@ const initial = {
 
   //book interview
   function bookInterview(id, interview) {
+
     return axios.put(`http://localhost:8001/api/appointments/${id}`, { interview })
       .then(() => {
         const appointment = {
           ...state.appointments[id],
-          interview: { ...interview }
+          interview: { ...interview },
         };
         const appointments = {
           ...state.appointments,
-          [id]: appointment
+          [id]: appointment,
         };
+
+        // for (let day of state.days) {
+        //   if (state.day === day.name) {
+        //     day.spots -= 1;
+        //   }
+        //   console.log("spot", day.spots)
+        //   return day.spots
+        // }
+
         dispatch({ type: SET_INTERVIEW, value: {appointments} });
       })
   }

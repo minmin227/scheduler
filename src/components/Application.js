@@ -23,7 +23,7 @@ export default function Application(props) {
 
   const appointment = todayAppointments.map((appointment) => {
 
-    let interview = getInterview(state, appointment.interview)
+  const interview = getInterview(state, appointment.interview)
 
     return (
       <Appointment
@@ -52,6 +52,7 @@ export default function Application(props) {
             days={state.days}
             day={state.day}
             setDay={setDay}
+            spots = {state.spots}            
           />
 
         </nav>
