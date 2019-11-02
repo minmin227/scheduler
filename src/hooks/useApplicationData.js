@@ -1,14 +1,12 @@
-import React, { useState, useEffect, useReducer } from 'react';
-import axios from 'axios';
-
+import { useEffect, useReducer } from "react";
+import axios from "axios";
 
 export function useApplicationData(props) {
-
-const initial = {
+  const initial = {
     day: "Monday",
     days: [],
-    appointments: {},
-  }
+    appointments: {}
+  };
 
   const SET_DAY = "SET_DAY";
   const SET_APPLICATION_DATA = "SET_APPLICATION_DATA";
@@ -17,13 +15,13 @@ const initial = {
   function reducer(state, action) {
     switch (action.type) {
       case SET_DAY:
-        return { ...state, ...action.value }
+        return { ...state, ...action.value };
 
       case SET_APPLICATION_DATA:
-        return { ...state, ...action.value }
+        return { ...state, ...action.value };
 
       case SET_INTERVIEW:
-        return { ...state, ...action.value }
+        return { ...state, ...action.value };
 
       default:
         throw new Error(
@@ -34,63 +32,92 @@ const initial = {
 
   const [state, dispatch] = useReducer(reducer, initial);
 
-  const setDay = day => dispatch({ type: SET_DAY, value: {day} });
+  const setDay = day => dispatch({ type: SET_DAY, value: { day } });
 
+  //update data from api
   useEffect(() => {
     Promise.all([
       Promise.resolve(axios.get("http://localhost:8001/api/days")),
       Promise.resolve(axios.get("http://localhost:8001/api/appointments")),
       Promise.resolve(axios.get("http://localhost:8001/api/interviewers"))
-    ]).then((all) => {
+    ]).then(all => {
       const days = all[0].data;
       const appointments = all[1].data;
       const interviewers = all[2].data;
 
-      dispatch({ type: SET_APPLICATION_DATA, value: {days, appointments, interviewers} })
-    })
-  }, [])
+      dispatch({
+        type: SET_APPLICATION_DATA,
+        value: { days, appointments, interviewers }
+      });
+    });
+  }, []);
 
   //book interview
   function bookInterview(id, interview) {
-
-    return axios.put(`http://localhost:8001/api/appointments/${id}`, { interview })
+    return axios
+      .put(`http://localhost:8001/api/appointments/${id}`, { interview })
       .then(() => {
         const appointment = {
           ...state.appointments[id],
-          interview: { ...interview },
+          interview: { ...interview }
         };
         const appointments = {
           ...state.appointments,
-          [id]: appointment,
+          [id]: appointment
         };
 
-        // for (let day of state.days) {
-        //   if (state.day === day.name) {
-        //     day.spots -= 1;
-        //   }
-        //   console.log("spot", day.spots)
-        //   return day.spots
-        // }
-
-        dispatch({ type: SET_INTERVIEW, value: {appointments} });
+        dispatch({ type: SET_INTERVIEW, value: { appointments } });
       })
+      .then(() => {
+        Promise.all([
+          Promise.resolve(axios.get("http://localhost:8001/api/days")),
+          Promise.resolve(axios.get("http://localhost:8001/api/appointments")),
+          Promise.resolve(axios.get("http://localhost:8001/api/interviewers"))
+        ]).then(all => {
+          const days = all[0].data;
+          const appointments = all[1].data;
+          const interviewers = all[2].data;
+
+          dispatch({
+            type: SET_APPLICATION_DATA,
+            value: { days, appointments, interviewers }
+          });
+        });
+      });
   }
 
   //cancel interview
   function cancelInterview(id, interview) {
-    return axios.delete(`http://localhost:8001/api/appointments/${id}`)
+    return axios
+      .delete(`http://localhost:8001/api/appointments/${id}`)
       .then(() => {
-          const appointment = {
-            ...state.appointments[id],
-            interview: null
-          };
-          const appointments = {
-            ...state.appointments,
-            [id]: appointment
-          };
-          
-          dispatch({ type: SET_INTERVIEW, value: {appointments} });
-        })
+        const appointment = {
+          ...state.appointments[id],
+          interview: null
+        };
+        const appointments = {
+          ...state.appointments,
+          [id]: appointment
+        };
+
+        dispatch({ type: SET_INTERVIEW, value: { appointments } });
+      })
+      .then(() => {
+        Promise.all([
+          Promise.resolve(axios.get("http://localhost:8001/api/days")),
+          Promise.resolve(axios.get("http://localhost:8001/api/appointments")),
+          Promise.resolve(axios.get("http://localhost:8001/api/interviewers"))
+        ]).then(all => {
+          const days = all[0].data;
+          const appointments = all[1].data;
+          const interviewers = all[2].data;
+
+          dispatch({
+            type: SET_APPLICATION_DATA,
+            value: { days, appointments, interviewers }
+          });
+        });
+      });
   }
 
   return {
@@ -98,5 +125,5 @@ const initial = {
     setDay,
     bookInterview,
     cancelInterview
-  }
+  };
 }

@@ -1,6 +1,5 @@
-import React, { useState, useEffect } from "react";
+import React from "react";
 import "components/Application.scss";
-import axios from "axios";
 import DayList from "components/DayList";
 import Appointment from "./Appointment";
 import { getAppointmentsForDay } from "../helpers/selector";
@@ -51,8 +50,7 @@ export default function Application(props) {
           <DayList
             days={state.days}
             day={state.day}
-            setDay={setDay}
-            spots = {state.spots}            
+            setDay={setDay}           
           />
 
         </nav>
