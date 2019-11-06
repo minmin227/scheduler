@@ -1,5 +1,13 @@
 # Interview Scheduler
 
+## Final Product
+
+!["main page"](picture/pic1.png)
+!["responsiveness"](picture/pic2.png)
+!["edit"](picture/pic2.png)
+!["usage"](picture/vid.mov)
+
+
 ## Setup
 
 Install dependencies with `npm install`.
