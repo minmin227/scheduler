@@ -1,12 +1,13 @@
 import { useEffect, useReducer } from "react";
 import axios from "axios";
 
-export function useApplicationData(props) {
+export function useApplicationData() {
   const initial = {
     day: "Monday",
     days: [],
     appointments: {}
   };
+
 
   const SET_DAY = "SET_DAY";
   const SET_APPLICATION_DATA = "SET_APPLICATION_DATA";
@@ -33,7 +34,8 @@ export function useApplicationData(props) {
   const [state, dispatch] = useReducer(reducer, initial);
 
   const setDay = day => dispatch({ type: SET_DAY, value: { day } });
-
+  
+  
   //update data from api
   useEffect(() => {
     Promise.all([
@@ -57,6 +59,7 @@ export function useApplicationData(props) {
     return axios
       .put(`http://localhost:8001/api/appointments/${id}`, { interview })
       .then(() => {
+        
         const appointment = {
           ...state.appointments[id],
           interview: { ...interview }
@@ -118,6 +121,7 @@ export function useApplicationData(props) {
           });
         });
       });
+      
   }
 
   return {
